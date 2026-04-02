@@ -1,0 +1,28 @@
+services:
+  mcp_server:
+    image: studio-base
+    container_name: mcp_server
+    command: pixi run mcp_server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - OTEL_SERVICE_NAME=mcp_server
+      - QDRANT_URL=172.30.0.1
+      - QDRANT_PORT=6333
+    volumes:
+      - .:/app
+      - hf_cache:/root/.cache/huggingface
+    networks: [studio_net]
+ 
+volumes:
+  hf_cache:
+  
+networks:
+  studio_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1

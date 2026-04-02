@@ -1,0 +1,92 @@
+[project]
+name = "SCEPA-MCP"
+description = "SCEPA MCP Server"
+readme = "README.md"
+license = { text = "NONE" }
+authors = [
+  { name = "RaoulG", email = "Raoul.Grouls@han.nl" },
+  { name = "Hoog-V",  email = "victor.hogeweij@han.nl" },
+  { name = "Simon Dingemans", email = "simon.dingemans@gmail.com" }
+]
+
+requires-python = ">=3.11"
+dynamic = ["version"]
+
+dependencies = [
+  "database-builder-libs @ git+https://github.com/AIM-kennisplatformen/database-builder-libs.git@fetch-relations-for-mcp-tools", 
+  "fastmcp>=2.10.1",
+  "typedb-driver>=3.8.0",
+  "langfuse",
+  "loguru>=0.7.3",
+  "python-dotenv>=1.2.1",
+  "qdrant-client",
+  "pyzotero>=1.7.6",
+  "mcp-use>=1.7.0,<2", 
+  "typing-extensions", 
+  "sentence-transformers==5.1.2",
+]
+
+[dependency-groups]
+dev = [
+  "lefthook",
+  "pytest>=9.0.2",
+  "ruff>=0.14.11",
+  "ty>=0.0.12",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server"]
+
+[tool.pixi.workspace]
+channels = [
+  "https://fast.prefix.dev/conda-forge",
+  "https://repo.prefix.dev/pypdfium2-public",
+  "https://repo.prefix.dev/pytorch",
+]
+platforms = ["linux-64", "osx-arm64", "win-64"]
+
+[tool.pixi.dependencies]
+compilers = ">=1.9.0"
+pkg-config = ">=0.29.2"
+pip = "*"
+
+[tool.pytest.ini_options]
+pythonpath = ["src/"]
+addopts = ["--import-mode=importlib"]
+testpaths = ["tests/mcp_server"]
+filterwarnings = [
+    "ignore:datetime.datetime.utcnow.*:DeprecationWarning"
+]
+
+[tool.ty.src]
+include=["src"]
+exclude=["tests/", ".pixi/"]
+
+[tool.ruff.lint]
+select = ["B024", "E4", "E7", "E9", "E301", "F", "C4", "PT"]
+
+[tool.ruff]
+exclude = [".pixi", "tests"]
+
+[tool.pixi.tasks]
+lint = "ruff check"
+format = "ruff format"
+typecheck = "ty check ."
+test = "pytest -s"
+app = "python -m src.mcp_server.main"
+
+
+[tool.pixi.activation.env]
+PYTHONNOUSERSITE = "1"
+LD_LIBRARY_PATH  = "$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
+
+[tool.pixi.target.linux-64.dependencies]
+python-devtools = ">=0.12.2"
+
+[tool.pixi.environments]
+default = { features = ["dev"], solve-group = "default" }
+development = { features = ["dev"], solve-group = "default" }
