@@ -1,3 +1,5 @@
+from enum import Enum
+
 from langfuse import observe
 from mcp.server.fastmcp import FastMCP
 from qdrant_client.models import FieldCondition, Filter, MatchAny
@@ -11,7 +13,6 @@ from database_builder_libs.utility.embed_chunk.openai_compatible import (
 from database_builder_libs.models.chunk import Chunk
 
 from src.mcp_server.config import config
-from src.mcp_server.sources.typedb_source import TypeDBSource
 
 # -------------------------------
 # MCP server initialization
@@ -22,12 +23,12 @@ typedb = TypeDbDatastore()
 typedb.connect(
         {
             "uri": config["typedb_uri"],
-            "username": "admin",
-            "password": "password",
-            "database": config["typedb_database"]
+            "username": config["typedb_user"],
+            "password": config["typedb_password"],
+            "database": config["typedb_database"],
+            "tls": config["typedb_uri"].startswith("https://")
         }
     )
-typedb_source = TypeDBSource(typedb)
 
 qdrant = QdrantDatastore()
 qdrant.connect(
@@ -35,14 +36,27 @@ qdrant.connect(
         "url": config["qdrant_url"],
         "collection": config["qdrant_collection"],
         "vector_size": config["qdrant_vector_size"],
+        "api_key": config["qdrant_api_key"],
     }
 )
 
+class Keywords(Enum):
+    BEST_PRACTICES = "best practices"
+    TARGET_GROUPS = "target groups"
+    STRATEGIC_OVERVIEW = "strategic overview"
+
+class LiteratureType(Enum):
+    SCIENTIFIC = "scientific"
+    PROJECT_REPORTS = "projectreports"
+    SURVEYS = "surveys"
+    GREY_LITERATURE = "greyliterature"
 
 @mcp.tool()
 @observe(name="get_literature_supported_knowledge_sources")
 def get_literature_supported_knowledge(
-    full_question: str, keywords_related_to_question: str
+    full_question: str, 
+    keywords_related_to_question: list[Keywords],
+    literature_type: LiteratureType | None = None
 ) -> str:
     """
     Provide a human-readable summary of relevant literature
@@ -52,19 +66,30 @@ def get_literature_supported_knowledge(
         "tool_call, full_question: "
         + full_question
         + " keywords: "
-        + keywords_related_to_question
+        + ", ".join([keyword.value for keyword in keywords_related_to_question])
+        + " literature_type: "
+        + (literature_type.value if literature_type else "all types of literature")
     )
 
-    # 1. Retrieve TypeDB metadata
-    related_sources = typedb_source.extract_metadata(
-        query=keywords_related_to_question
+    filter = "relation=discriminatingconcept-bol"
+    if literature_type is not None:
+        filter += f'-{literature_type.value}'
+    
+    related_sources = typedb.get_relations(
+        filter
     )
 
     if not related_sources:
         return "No relevant literature was found based on the provided keywords."
 
     # 2. Collect Document keys (hashes)
-    hashes = [s.get("key") for s in related_sources if "key" in s]
+    hashes = [
+        s.get("roles").get("attributedthing").get("key") 
+        for s in related_sources if s.get("roles") 
+        and s.get("roles").get("attributedthing") 
+        and s.get("roles").get("attributedthing").get("key")
+    ]
+    
     if not hashes:
         return "No valid document references were found."
 
@@ -91,7 +116,7 @@ def get_literature_supported_knowledge(
     filter = Filter(
         must=[
             FieldCondition(
-                key="document_id",
+                key="document_hash",
                 match=MatchAny(any=valid_hashes),
             )
         ]
@@ -134,7 +159,5 @@ def get_literature_supported_knowledge(
 
 
 if __name__ == "__main__":
-    # mcp.settings.host="0.0.0.0"
-    # mcp.settings.port=10000
     # mcp.run(transport="sse")
-    get_literature_supported_knowledge("Agro puning", "Best practices")
+    print(get_literature_supported_knowledge("What are best practices for energy poverty?", [Keywords.BEST_PRACTICES], LiteratureType.SCIENTIFIC))

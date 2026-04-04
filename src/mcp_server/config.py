@@ -18,10 +18,13 @@ config: dict = {
     # TYPEDB
     "typedb_uri": require_env("TYPEDB_URI"),
     "typedb_database": require_env("TYPEDB_DATABASE"),
+    "typedb_user": require_env("TYPEDB_USER"),
+    "typedb_password": require_env("TYPEDB_PASSWORD"),
     # QDRANT
     "qdrant_url": require_env("QDRANT_URL"),
     "qdrant_collection": require_env("QDRANT_COLLECTION"),
     "qdrant_vector_size": require_env("QDRANT_VECTOR_SIZE"),
+    "qdrant_api_key": require_env("QDRANT_API_KEY"),
     # LANGFUSE
     "langfuse_secret_key": require_env("LANGFUSE_SECRET_KEY"),
     "langfuse_public_key": require_env("LANGFUSE_PUBLIC_KEY"),
