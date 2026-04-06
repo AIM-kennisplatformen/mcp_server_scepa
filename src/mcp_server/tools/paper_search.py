@@ -76,13 +76,13 @@ def get_literature_supported_knowledge(
         }};
     """
 
-    related_sources = typedb.query_read(query=query).as_concept_documents()
+    related_sources = list(typedb.query_read(query=query).as_concept_documents())
 
     if not related_sources:
         return "No relevant literature was found based on the provided keywords."
 
     hashes = [
-        source.get("entity").get("hashvalue") 
+        source["entity"]["hashvalue"]
         for source in related_sources
     ]
     
@@ -90,9 +90,8 @@ def get_literature_supported_knowledge(
         return "No valid document references were found."
     
     title_lookup = {
-        src["key"]: src["data"].get("title", "Unknown title")
-        for src in related_sources
-        if "key" in src and "data" in src
+        source["entity"]["hashvalue"]: source["entity"]["namelike-title"]
+        for source in related_sources
     }
 
     query_chunk = Chunk(
@@ -136,7 +135,7 @@ def get_literature_supported_knowledge(
     lines = ["Relevant literature found:\n"]
 
     for item in qdrant_results:
-        hash_key = item.get("document_id") or item.get("zotero_hash")
+        hash_key = item.get("document_hash")
         title = title_lookup.get(hash_key, "Unknown title")
         score = item.get("score", 0)
         snippet = str(item.get("text", "")).strip()
