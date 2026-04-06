@@ -77,7 +77,7 @@ lint = "ruff check"
 format = "ruff format"
 typecheck = "ty check ."
 test = "pytest -s"
-mcp_server = "python -m src.mcp_server.main"
+mcp_server = "PYTHONPATH=src python -m mcp_server.main"
 
 
 [tool.pixi.activation.env]
