@@ -14,9 +14,9 @@ pixi run mcp_server
 
 ## MCP Tool Documentation
 
-When documenting MCP tools (functions exposed to the LLM), **do not use standard Python docstrings for developer notes**. The MCP protocol parses these docstrings to generate tool descriptions for the LLM. Using them for developer documentation can confuse the LLM and consume unnecessary tokens.
+When documenting MCP tools (functions exposed to the LLM), **do not use standard Python docstrings for documentation**. The MCP protocol parses these docstrings to generate tool descriptions for the LLM. Using them for documentation can confuse the LLM and consume unnecessary tokens.
 
-Instead, please provide developer context, architectural notes, and logic explanations using standard Python inline comments (`#`) directly within the code.
+Instead, provide documentation using standard Python inline comments (`#`) directly within the code.
 
 ## License
 

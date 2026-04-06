@@ -21,7 +21,7 @@ dependencies = [
   "python-dotenv>=1.2.1",
   "qdrant-client",
   "pyzotero>=1.7.6",
-  "mcp-use>=1.7.0,<2", 
+  "fastmcp>=3.2", 
   "typing-extensions", 
   "sentence-transformers==5.1.2",
 ]
