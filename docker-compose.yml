@@ -39,7 +39,7 @@ volumes:
 networks:
   studio_net:
     driver: bridge
-    external: false  # Keep as false initially
+    external: false
     ipam:
       config:
         - subnet: 172.30.0.0/16
