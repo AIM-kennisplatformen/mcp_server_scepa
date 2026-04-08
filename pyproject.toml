@@ -13,7 +13,7 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 
 dependencies = [
-  "database-builder-libs @ git+https://github.com/AIM-kennisplatformen/database-builder-libs.git@fetch-relations-for-mcp-tools", 
+  "database-builder-libs @ git+https://github.com/AIM-kennisplatformen/database-builder-libs.git", 
   "fastmcp>=2.10.1",
   "typedb-driver>=3.8.0",
   "langfuse",
@@ -23,7 +23,6 @@ dependencies = [
   "pyzotero>=1.7.6",
   "fastmcp>=3.2", 
   "typing-extensions", 
-  "sentence-transformers==5.1.2",
 ]
 
 [dependency-groups]
