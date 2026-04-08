@@ -35,10 +35,11 @@ services:
  
 volumes:
   hf_cache:
-  
+
 networks:
   studio_net:
     driver: bridge
+    external: false  # Keep as false initially
     ipam:
       config:
         - subnet: 172.30.0.0/16

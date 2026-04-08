@@ -1,5 +1,5 @@
 from enum import Enum
-
+from pydantic import BaseModel, Field
 from langfuse import observe
 from qdrant_client.models import FieldCondition, Filter, MatchAny
 from database_builder_libs.utility.embed_chunk.openai_compatible import (
@@ -10,12 +10,12 @@ from database_builder_libs.models.chunk import Chunk
 from mcp_server.utility.globals import typedb, qdrant
 from mcp_server.config import config
 
-class Keywords(Enum):
+class Keywords(str, Enum):
     BEST_PRACTICES = "best-practices"
     TARGET_GROUPS = "target-groups"
     STRATEGIC_OVERVIEW = "strategic-overview"
 
-class LiteratureType(Enum):
+class LiteratureType(str, Enum):
     SCIENTIFIC = "scientific"
     PROJECT_REPORTS = "projectreports"
     SURVEYS = "surveys"
@@ -36,7 +36,7 @@ def get_literature_supported_knowledge(
     Args:
         full_question (str): The complete user query used to find semantically matching text.
         keywords_related_to_question (list[Keywords]): A list of strategic keywords to narrow 
-            the search space to relevant domains.
+            the search space to relevant domains. Valid values: 'best-practices', 'target-groups', 'strategic-overview'
         literature_types (list[LiteratureType] | None, optional): Specific document types 
             to restrict the search (e.g., scientific, surveys). Defaults to None.
 
