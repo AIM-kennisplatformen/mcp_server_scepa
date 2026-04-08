@@ -38,7 +38,7 @@ def get_literature_supported_knowledge(
         keywords_related_to_question (list[Keywords]): A list of strategic keywords to narrow 
             the search space to relevant domains. Valid values: 'best-practices', 'target-groups', 'strategic-overview'
         literature_types (list[LiteratureType] | None, optional): Specific document types 
-            to restrict the search. Valid values: 'scientific', 'projectreports', 'surveys', 'greyliterature', null
+            to restrict the search. Valid values: null
 
     Returns:
         str: A formatted string containing the most relevant text fragments, along 
