@@ -1,0 +1,45 @@
+
+
+services:
+  mcp_server_scepa:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    command: pixi run mcp_server
+    ports:
+      - "9000:8001"
+    env_file:
+      - .env
+    environment:
+      - OPENAI_HOST
+      - OPENAI_API_KEY
+      - OPENAI_EMBEDDING_MODEL
+
+      - TYPEDB_URI
+      - TYPEDB_DATABASE
+      - TYPEDB_USER
+      - TYPEDB_PASSWORD
+
+      - QDRANT_URL
+      - QDRANT_COLLECTION
+      - QDRANT_VECTOR_SIZE
+      - QDRANT_API_KEY
+
+      - LANGFUSE_SECRET_KEY
+      - LANGFUSE_PUBLIC_KEY
+      - LANGFUSE_HOST
+    volumes:
+      - .:/app
+      - hf_cache:/root/.cache/huggingface
+    networks: [studio_net]
+ 
+volumes:
+  hf_cache:
+  
+networks:
+  studio_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
