@@ -132,18 +132,23 @@ def get_literature_supported_knowledge(
     if not qdrant_results:
         return "No relevant text fragments were found in the knowledge base."
 
+    return format_literature_response(qdrant_results, title_lookup)
+
+def format_literature_response(qdrant_results: list[dict], title_lookup: dict[str, str]) -> str:
+    if not qdrant_results:
+        return "No relevant text fragments were found in the knowledge base."
+
     lines = ["Relevant literature found:\n"]
 
     for item in qdrant_results:
         hash_key = item.get("document_hash")
         title = title_lookup.get(hash_key, "Unknown title")
-        score = item.get("score", 0)
         snippet = str(item.get("text", "")).strip()
 
         # Truncate snippet if too long
         if len(snippet) > 500:
             snippet = snippet[:500].rsplit(" ", 1)[0] + "..."
 
-        lines.append(f"- Score {score:.2f}\n  Title: {title}\n  Source: {snippet}\n")
+        lines.append(f"- \n  Title: {title}\n  Source: {snippet}\n")
 
     return "\n".join(lines)
