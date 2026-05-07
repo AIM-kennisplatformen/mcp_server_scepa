@@ -33,7 +33,7 @@ def get_literature_supported_knowledge(
     keywords_related_to_question: list[Keywords],
     literature_types: list[LiteratureType] | None = None,
     # NEW: expose reranking knobs so callers can tune without touching internals
-    rerank_top_k: int = 10,
+    rerank_top_k: int = 30,
 ) -> str:
     """
     Retrieves relevant literature snippets from the knowledge base to answer a user's question.
@@ -165,7 +165,7 @@ def get_literature_supported_knowledge(
     reranked = sorted(qdrant_results, key=lambda x: x["rerank_score"], reverse=True)
     top_results = reranked[:rerank_top_k]
 
-    lines = ["Relevant literature found (reranked):\n"]
+    lines = []
 
     for item in top_results:
         hash_key = item.get("document_hash")
