@@ -32,6 +32,21 @@ services:
       - .:/app
       - hf_cache:/root/.cache/huggingface
     networks: [studio_net]
+    healthcheck:
+      test:
+        - CMD
+        - pixi
+        - run
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          response = urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2);
+          raise SystemExit(0 if response.status == 200 and response.read() == b'OK' else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 2m
  
 volumes:
   hf_cache:
